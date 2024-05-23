@@ -1,0 +1,10 @@
+﻿@page "/assistant/eshop"
+@using Chat.Services
+@rendermode InteractiveServer
+
+<Assistant Service="@Service"/>
+
+@code {
+    [Inject(Key = "eshop")]
+    public IAssistantService Service { get; set; }
+}

@@ -1,0 +1,10 @@
+﻿@page "/assistant/amazon"
+@using Chat.Services
+@rendermode InteractiveServer
+
+<Assistant Service="@Service"/>
+
+@code {
+    [Inject(Key = "amazon")]
+    public IAssistantService Service { get; set; }
+}

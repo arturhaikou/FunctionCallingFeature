@@ -1,0 +1,72 @@
+﻿@using Chat.Models
+@using Chat.Services
+
+@if (!_isChatting)
+{
+    <p>
+        Enter your name to start chatting:
+    </p>
+
+    <input type="text" maxlength="32" @bind="@_username" />
+    <button type="button" @onclick="@Init"><span class="oi oi-chat" aria-hidden="true"></span> Chat!</button>
+}
+else
+{
+    <div id="scrollbox">
+        @foreach (var item in _messages)
+        {
+            <div class="@(item.Role == ChatMessageRole.User ? "user" : "assistant")">
+                <div class="name">@item.Name</div>
+                <pre class="msg">@item.Content</pre>
+            </div>
+        }
+        <hr />
+        <textarea class="input-lg" placeholder="enter your comment" @bind="@_newMessage"></textarea>
+        <button class="btn btn-default" @onclick="@(() => SendMessageAsync(_newMessage))">Send</button>
+    </div>
+}
+
+@code {
+    private bool _isChatting;
+    private string _username;
+    private string _newMessage;
+    private readonly List<ChatMessage> _messages = new List<ChatMessage>();
+    [Parameter]
+    public IAssistantService Service { get; set; }
+
+    private void Init()
+    {
+        var message = new ChatMessage
+            {
+                Role = ChatMessageRole.Assistant,
+                Name = ChatMessageRole.Assistant.ToString(),
+                Content = $"Hello {_username}! What would you like to do?"
+            };
+        _messages.Add(message);
+        _isChatting = true;
+    }
+
+    private async Task SendMessageAsync(string message)
+    {
+        _newMessage = "...processing";
+        var userMessage = new ChatMessage
+            {
+                Content = message,
+                Name = _username,
+                Role = ChatMessageRole.User
+            };
+
+        _messages.Add(userMessage);
+
+        var response = await Service.PerformActionAsync(new UserRequest { Input = message, Name = _username });
+
+        var assistantMessage = new ChatMessage
+            {
+                Content = response,
+                Name = ChatMessageRole.Assistant.ToString(),
+                Role = ChatMessageRole.Assistant
+            };
+        _messages.Add(assistantMessage);
+        _newMessage = null;
+    }
+}

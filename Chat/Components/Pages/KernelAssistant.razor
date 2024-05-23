@@ -1,0 +1,10 @@
+﻿@page "/assistant/kernel"
+@using Chat.Services
+@rendermode InteractiveServer
+
+<Assistant Service="@Service" />
+
+@code {
+    [Inject(Key = "kernel")]
+    public IAssistantService Service { get; set; }
+}
